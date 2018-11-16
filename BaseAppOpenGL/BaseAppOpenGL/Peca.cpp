@@ -18,10 +18,9 @@ Peca::Peca(float pX, float pY, float pZ, float pC)
 
 void Peca::showPeca(float pY, float pC)
 {
-	y = pY;
 	color = pC;
 	glPushMatrix();
-	glTranslatef(x, y, z);
+	glTranslatef(x, 0.5f, z);
 	glColor3f(color, color, color);
 	glRotatef(-90.0f, 1.0f, .0f, 0.0f);
 	DrawCircle(0.0f, 0.0f, 1.0f, 1.0f, 25);

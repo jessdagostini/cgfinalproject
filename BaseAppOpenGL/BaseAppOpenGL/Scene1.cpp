@@ -171,6 +171,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	glPushMatrix();
 	glTranslatef(.0f, 27.0f, 0.0f);	
 	DrawPecas();
+	pecas[I][J]->showPeca(0.5f, player);
 	glPopMatrix();
 
 	// Habilita mapeamento de texturas 2D
@@ -274,6 +275,9 @@ void CScene1::DrawPecas()
 			else if (visible[i][j]) {
 				pecas[i][j] = new Peca(x, y, z, colors[i][j]);
 			}
+			else {
+				pecas[i][j] = new Peca(x, 0.0f, z, 0.0f);
+			}
 			x += 1.75f;
 			z -= 1.75;
 		}
@@ -351,18 +355,22 @@ void CScene1::KeyPressed(void) // Tratamento de teclas pressionadas
 	if (GetKeyState(VK_UP) & 0x80)
 	{
 		if (posI >= 0.0f) posI -= 0.1f;
+		I = rint(int(posI));
 	}
 	if (GetKeyState(VK_DOWN) & 0x80)
 	{
 		if (posI <= 7.0f) posI += 0.1f;
+		I = rint(int(posI));
 	}
 	if (GetKeyState(VK_LEFT) & 0x80)
 	{
 		if (posJ >= 0.0f) posJ -= 0.1f;
+		J = rint(int(posJ));
 	}
 	if (GetKeyState(VK_RIGHT) & 0x80)
 	{
 		if (posJ <= 7.0f) posJ += 0.1f;
+		J = rint(int(posJ));
 	}
 
 	if (GetKeyState(VK_PRIOR) & 0x80)
@@ -395,6 +403,8 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 		else {
 			player = 1.0f;
 		}
+		I++;
+		J++;
 	}
 		break;
 
