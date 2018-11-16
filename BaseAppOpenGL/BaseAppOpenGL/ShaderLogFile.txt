@@ -1,0 +1,3 @@
+CShaderManager 2 (../Scene2/SpotLightShader.frag) compile error: WARNING: 0:1: '' :  #version directive missing
+
+
