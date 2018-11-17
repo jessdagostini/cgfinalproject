@@ -24,6 +24,7 @@ public:
 	void Draw3DSGrid(float width, float length);
 	void DrawAxis();
 	void DrawPecas();
+	void FlipPecas();
 
 	void DrawCircle(GLdouble x, GLdouble y, GLdouble z, GLdouble raio, int num_linhas);
 	void DrawCube(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
@@ -87,8 +88,8 @@ private:
 
 	Peca* pecas[8][8];
 	bool visible[8][8];
-	float posI, posJ;
-	int I, J;
+	float posC, posR;
+	int C, R;
 	float colors[8][8];
 	float player;
 };

@@ -31,10 +31,10 @@ CScene1::CScene1()
 
 	fTimerPosY = 0.0f;
 	fRenderPosY = 0.0f;
-	posI = 0;
-	posJ = 0; 
-	I = 0;
-	J = 0;
+	posR = 5.0f;
+	posC = 4.0f;
+	R = 5;
+	C = 4;
 
 	// Carrega todas as texturas
 	pTextures = new CTexture();
@@ -73,8 +73,21 @@ CScene1::CScene1()
 		}
 	}
 
+	// Seta como visível as primeiras 4 peças
+	visible[3][3] = true;
+	visible[4][4] = true;
+	visible[3][4] = true;
+	visible[4][3] = true;
+
+	// Seta as cores das peças
+	colors[3][3] = 0.0f;
+	colors[4][4] = 0.0f;
+	colors[3][4] = 1.0f;
+	colors[4][3] = 1.0f;
+
 	// Inicia a jogada sempre com o jogador cor preta
 	player = 0.0f;
+
 }
 
 
@@ -171,7 +184,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	glPushMatrix();
 	glTranslatef(.0f, 27.0f, 0.0f);	
 	DrawPecas();
-	pecas[I][J]->showPeca(0.5f, player);
+	pecas[R][C]->showPeca(0.5f, player);
 	glPopMatrix();
 
 	// Habilita mapeamento de texturas 2D
@@ -243,7 +256,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 
 	//// Imprime o FPS da aplicação e o Timer
 	glRasterPos2f(10.0f, 100.0f);
-	pTexto->glPrint("Valor de I: %d ---- Valor de J: %d", I, J);
+	pTexto->glPrint("Valor de I: %d ---- Valor de J: %d", R, C);
 
 	glPopMatrix();
 
@@ -263,16 +276,7 @@ void CScene1::DrawPecas()
 
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			// Seta as quatro peças iniciais como visíveis
-			if ((i == 3 && j == 3) || (i == 4 && j == 4)) {
-				pecas[i][j] = new Peca(x, y, z, 1.0f);
-				visible[i][j] = true;
-			} else if ((i == 3 && j == 4) || (i == 4 && j == 3)) {
-				glColor3f(1.0f, 1.0f, 1.0f);
-				pecas[i][j] = new Peca(x, y, z, 0.0f);
-				visible[i][j] = true;
-			}
-			else if (visible[i][j]) {
+			if (visible[i][j]) {
 				pecas[i][j] = new Peca(x, y, z, colors[i][j]);
 			}
 			else {
@@ -286,6 +290,140 @@ void CScene1::DrawPecas()
 		valorZ += 1.75f;
 		x = valorX;
 		z = valorZ;
+	}
+}
+
+void CScene1::FlipPecas()
+{
+	int peca_pos = -1;
+	// Confere peças a esquerda da posição
+	for (int c = C - 1; c >= 0 && visible[R][c] && peca_pos == -1; c--) {
+		// Se a peça está visível e é da cor q esta jogando, seta peca_pos
+		if (colors[R][c] == player) {
+			peca_pos = c;
+		}
+	}
+
+	// Garante que encontrou uma peça e ela está pelo menos duas posicoes longe
+	if (peca_pos != -1 && peca_pos < C - 1) {
+		// Seta todas as peças visíveis com a cor do player atual
+		for (int i = C - 1; i > peca_pos; i--) {
+			colors[R][i] = player;
+		}
+	}
+
+	peca_pos = -1;
+	// Confere peças a direita da posição
+	for (int i = C + 1; i <= 7 && visible[R][i] && peca_pos == -1; i++) {
+		if (colors[R][i] == player) {
+			peca_pos = i;
+		}
+	}
+
+	if (peca_pos != -1 && peca_pos > C + 1) {
+		for (int i = C + 1; i < peca_pos; i++) {
+			colors[R][i] = player;
+		}
+	}
+
+	peca_pos = -1;
+	// Confere peças acima da posição
+	for (int i = R - 1; i >= 0 && visible[i][C] && peca_pos == -1; i--) {
+		if (colors[i][C] == player) {
+			peca_pos = i;
+		}
+	}
+
+	if (peca_pos != -1 && peca_pos < R - 1) {
+		for (int i = R - 1; i > peca_pos; i--) {
+			colors[i][C] = player;
+		}
+	}
+
+	peca_pos = -1;
+	// Confere peças abaixo da posição
+	for (int i = R + 1; i <= 7 && visible[i][C] && peca_pos == -1; i++) {
+		if (colors[i][C] == player) {
+			peca_pos = i;
+		}
+	}
+
+	if (peca_pos != -1 && peca_pos > R + 1) {
+		for (int i = R + 1; i < peca_pos; i++) {
+			colors[i][C] = player;
+		}
+	}
+
+	peca_pos = -1;
+	int c = C - 1;
+	// Confere peças na diagonal superior esquerda da posição
+	for (int r = R - 1; c >= 0 && r >= 0 && visible[r][c] && peca_pos == -1; r--) {
+		if (colors[r][c] == player) {
+			peca_pos = r;
+		}
+		c--;
+	}
+
+	if (peca_pos != -1 && peca_pos < R - 1) {
+		c = C - 1;
+		for (int r = R - 1; r > peca_pos; r--) {
+			colors[r][c] = player;
+			c--;
+		}
+	}
+
+	peca_pos = -1;
+	c = C + 1;
+	// Confere peças na diagonal superior direita da posição
+	for (int r = R - 1; c <= 7 && r >= 0 && visible[r][c] && peca_pos == -1; r--) {
+		if (colors[r][c] == player) {
+			peca_pos = r;
+		}
+		c++;
+	}
+	// Make sure we found a piece and that it is at least 2 spots away
+	if (peca_pos != -1 && peca_pos < R - 1) {
+		c = C + 1;
+		for (int r = R - 1; r > peca_pos; r--) {
+			colors[r][c] = player;
+			c++;
+		}
+	}
+
+	peca_pos = -1;
+	c = C - 1;
+	// Confere peças na diagonal inferior esquerda da posição
+	for (int r = R + 1; c >= 0 && r <= 7 && visible[r][c] && peca_pos == -1; r++) {
+		if (colors[r][c] == player) {
+			peca_pos = r;
+		}
+		c--;
+	}
+
+	if (peca_pos != -1 && peca_pos > R + 1) {
+		c = C - 1;
+		for (int r = R + 1; r < peca_pos; r++) {
+			colors[r][c] = player;
+			c--;
+		}
+	}
+
+	peca_pos = -1;
+	c = C + 1;
+	// Confere peças na diagonal inferior direita da posição
+	for (int r = R + 1; c <= 7 && r <= 7 && visible[r][c] && peca_pos == -1; r++) {
+		if (colors[r][c] == player) {
+			peca_pos = r;
+		}
+		c++;
+	}
+	// Make sure we found a piece and that it is at least 2 spots away
+	if (peca_pos != -1 && peca_pos > R + 1) {
+		c = C + 1;
+		for (int r = R + 1; r < peca_pos; r++) {
+			colors[r][c] = player;
+			c++;
+		}
 	}
 }
 
@@ -354,23 +492,23 @@ void CScene1::KeyPressed(void) // Tratamento de teclas pressionadas
 
 	if (GetKeyState(VK_UP) & 0x80)
 	{
-		if (posI >= 0.0f) posI -= 0.1f;
-		I = rint(int(posI));
+		if (posR >= 0.0f) posR -= 0.1f;
+		R = rint(int(posR));
 	}
 	if (GetKeyState(VK_DOWN) & 0x80)
 	{
-		if (posI <= 7.0f) posI += 0.1f;
-		I = rint(int(posI));
+		if (posR <= 7.0f) posR += 0.1f;
+		R = rint(int(posR));
 	}
 	if (GetKeyState(VK_LEFT) & 0x80)
 	{
-		if (posJ >= 0.0f) posJ -= 0.1f;
-		J = rint(int(posJ));
+		if (posC >= 0.0f) posC -= 0.1f;
+		C = rint(int(posC));
 	}
 	if (GetKeyState(VK_RIGHT) & 0x80)
 	{
-		if (posJ <= 7.0f) posJ += 0.1f;
-		J = rint(int(posJ));
+		if (posC <= 7.0f) posC += 0.1f;
+		C = rint(int(posC));
 	}
 
 	if (GetKeyState(VK_PRIOR) & 0x80)
@@ -393,18 +531,17 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 
 	case VK_SPACE:
 	{
-		I = rint(int(posI));
-		J = rint(int(posJ));
-		visible[I][J] = true;
-		colors[I][J] = player;
+		R = rint(int(posR));
+		C = rint(int(posC));
+		visible[R][C] = true;
+		colors[R][C] = player;
+		FlipPecas();
 		if (player == 1.0f) {
 			player = 0.0f;
 		}
 		else {
 			player = 1.0f;
 		}
-		I++;
-		J++;
 	}
 		break;
 
