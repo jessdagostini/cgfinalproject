@@ -88,6 +88,11 @@ CScene1::CScene1()
 	// Inicia a jogada sempre com o jogador cor preta
 	player = 0.0f;
 
+	// Inicia os jogadores com 2 peças cada
+	pBlackPoints = pWhitePoints = 2;
+
+	winner = -1;
+
 }
 
 
@@ -168,7 +173,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	// Desenha grid 
 	//Draw3DSGrid(20.0f, 20.0f);
 
-	DrawAxis();
+	//DrawAxis();
 
 	// Modo FILL ou WIREFRAME (pressione barra de espaço)	
 	if (bIsWireframe)
@@ -197,7 +202,6 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
 	pModel3DS_1->Draw();
 	glPopMatrix();
-
 	
 	// Desenha as árvores aplicando Blending.
 	// A operação é baseada no canal Alpha da textura .TGA
@@ -208,8 +212,6 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	auxSolidBox(100.0f, 0.1f, 100.0f);
 	glPopMatrix();
 	glDisable(GL_BLEND);
-
-
 	glDisable(GL_TEXTURE_2D);
 
 
@@ -227,23 +229,36 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 
 
 	glPushMatrix();
-	glTranslatef(0.0f, HEIGHT - 100, 0.0f);	// Move 1 unidade para dentro da tela (eixo Z)
+	glTranslatef(0.0f, HEIGHT - 700, 0.0f);	// Move 1 unidade para dentro da tela (eixo Z)
 
 	// Cor da fonte
 	glColor3f(1.0f, 1.0f, 0.0f);
 
-
-	glRasterPos2f(10.0f, 0.0f);	// Posicionando o texto na tela
-	if (!bIsWireframe) {
+	glRasterPos2f(10.0f, 10.0f);	// Posicionando o texto na tela
+	pTexto->glPrint("SCORE:");
+	glRasterPos2f(10.0f, 30.0f);	// Posicionando o texto na tela
+	pTexto->glPrint("Player Black: %d points", pBlackPoints);
+	glRasterPos2f(10.0f, 45.0f);	// Posicionando o texto na tela
+	pTexto->glPrint("Player White: %d points", pWhitePoints);
+	if (winner != -1) {
+		glRasterPos2f(10.0f, 70.0f);	// Posicionando o texto na tela
+		if (winner == 1) {
+			pTexto->glPrint("PLAYER WHITE WIN!");
+		}
+		else {			
+			pTexto->glPrint("PLAYER BLACK WIN!");
+		}
+	}
+	/*if (!bIsWireframe) {
 		pTexto->glPrint("[TAB]  Modo LINE"); // Imprime texto na tela
 	}
 	else {
 		pTexto->glPrint("[TAB]  Modo FILL");
-	}
+	}*/
 
 
 	//// Camera LookAt
-	glRasterPos2f(10.0f, 40.0f);
+	/*glRasterPos2f(10.0f, 40.0f);
 	pTexto->glPrint("Player LookAt  : %f, %f, %f", pCamera->Forward[0], pCamera->Forward[1], pCamera->Forward[2]);
 
 	//// Posição do Player
@@ -256,7 +271,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 
 	//// Imprime o FPS da aplicação e o Timer
 	glRasterPos2f(10.0f, 100.0f);
-	pTexto->glPrint("Valor de I: %d ---- Valor de J: %d", R, C);
+	pTexto->glPrint("Valor de I: %d ---- Valor de J: %d", R, C);*/
 
 	glPopMatrix();
 
@@ -427,6 +442,33 @@ void CScene1::FlipPecas()
 	}
 }
 
+void CScene1::CountPoints()
+{
+	pWhitePoints = pBlackPoints = 0;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (visible[i][j] && colors[i][j] == 1.0f) {
+				pWhitePoints++;
+			}
+			else if (visible[i][j] && colors[i][j] == 0.0f) {
+				pBlackPoints++;
+			}
+		}
+	}
+
+	if (pBlackPoints + pWhitePoints == 64) {
+		if (pBlackPoints > pWhitePoints) {
+			winner = 0;
+		}
+		else {
+			winner = 1;
+		}
+	}
+	else {
+		winner = -1;
+	}
+}
+
 void CScene1::DrawCircle(GLdouble x, GLdouble y, GLdouble z, GLdouble raio, int num_linhas)
 {
 	glPushMatrix();
@@ -536,6 +578,7 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 		visible[R][C] = true;
 		colors[R][C] = player;
 		FlipPecas();
+		CountPoints();
 		if (player == 1.0f) {
 			player = 0.0f;
 		}

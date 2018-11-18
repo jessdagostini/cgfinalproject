@@ -25,6 +25,7 @@ public:
 	void DrawAxis();
 	void DrawPecas();
 	void FlipPecas();
+	void CountPoints();
 
 	void DrawCircle(GLdouble x, GLdouble y, GLdouble z, GLdouble raio, int num_linhas);
 	void DrawCube(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
@@ -92,5 +93,8 @@ private:
 	int C, R;
 	float colors[8][8];
 	float player;
+
+	int pBlackPoints, pWhitePoints;
+	int winner;
 };
 
