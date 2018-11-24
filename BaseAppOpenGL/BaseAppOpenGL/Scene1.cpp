@@ -312,8 +312,9 @@ void CScene1::DrawPecas()
 	}
 }
 
-void CScene1::FlipPecas()
+bool CScene1::FlipPecas()
 {
+	bool flip = false;
 	int peca_pos = -1;
 	// Confere peças a esquerda da posição
 	for (int c = C - 1; c >= 0 && visible[R][c] && peca_pos == -1; c--) {
@@ -329,6 +330,7 @@ void CScene1::FlipPecas()
 		for (int i = C - 1; i > peca_pos; i--) {
 			colors[R][i] = player;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -343,6 +345,7 @@ void CScene1::FlipPecas()
 		for (int i = C + 1; i < peca_pos; i++) {
 			colors[R][i] = player;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -357,6 +360,7 @@ void CScene1::FlipPecas()
 		for (int i = R - 1; i > peca_pos; i--) {
 			colors[i][C] = player;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -371,6 +375,7 @@ void CScene1::FlipPecas()
 		for (int i = R + 1; i < peca_pos; i++) {
 			colors[i][C] = player;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -389,6 +394,7 @@ void CScene1::FlipPecas()
 			colors[r][c] = player;
 			c--;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -407,6 +413,7 @@ void CScene1::FlipPecas()
 			colors[r][c] = player;
 			c++;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -425,6 +432,7 @@ void CScene1::FlipPecas()
 			colors[r][c] = player;
 			c--;
 		}
+		flip = true;
 	}
 
 	peca_pos = -1;
@@ -443,7 +451,10 @@ void CScene1::FlipPecas()
 			colors[r][c] = player;
 			c++;
 		}
+		flip = true;
 	}
+
+	return flip;
 }
 
 void CScene1::CountPoints()
@@ -544,21 +555,25 @@ void CScene1::KeyPressed(void) // Tratamento de teclas pressionadas
 	{
 		if (posR >= 0.0f) posR -= 0.1f;
 		R = rint(int(posR));
+		CheckAvailability(0);
 	}
 	if (GetKeyState(VK_DOWN) & 0x80)
 	{
 		if (posR <= 7.0f) posR += 0.1f;
 		R = rint(int(posR));
+		CheckAvailability(1);
 	}
 	if (GetKeyState(VK_LEFT) & 0x80)
 	{
 		if (posC >= 0.0f) posC -= 0.1f;
 		C = rint(int(posC));
+		CheckAvailability(2);
 	}
 	if (GetKeyState(VK_RIGHT) & 0x80)
 	{
 		if (posC <= 7.0f) posC += 0.1f;
 		C = rint(int(posC));
+		CheckAvailability(3);
 	}
 
 	if (GetKeyState(VK_PRIOR) & 0x80)
@@ -581,17 +596,18 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 
 	case VK_SPACE:
 	{
-		R = rint(int(posR));
-		C = rint(int(posC));
-		visible[R][C] = true;
-		colors[R][C] = player;
-		FlipPecas();
-		CountPoints();
-		if (player == 1.0f) {
-			player = 0.0f;
-		}
-		else {
-			player = 1.0f;
+		bool flip = FlipPecas();
+		if (flip) {
+			visible[R][C] = true;
+			colors[R][C] = player;
+			
+			CountPoints();
+			if (player == 1.0f) {
+				player = 0.0f;
+			}
+			else {
+				player = 1.0f;
+			}
 		}
 	}
 		break;
@@ -603,6 +619,34 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 
 	}
 
+}
+
+void CScene1::CheckAvailability(int movement)
+{
+	if (visible[R][C]) {
+		bool found = false;
+		// Pra cima
+		if (movement == 0) {
+			while (visible[R][C]) {
+				R--;
+			}
+		// Para baixo
+		} else if (movement == 1) {
+			while (visible[R][C]) {
+				R++;
+			}
+		// Para esquerda
+		} else if (movement == 2) {
+			while (visible[R][C]) {
+				C--;
+			}
+		// Para direita
+		} else if (movement == 3) {
+			while (visible[R][C]) {
+				C++;
+			}
+		}
+	}
 }
 
 //	Cria um grid horizontal ao longo dos eixos X e Z

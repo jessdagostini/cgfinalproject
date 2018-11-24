@@ -25,8 +25,9 @@ public:
 	void Draw3DSGrid();
 	void DrawAxis();
 	void DrawPecas();
-	void FlipPecas();
+	bool FlipPecas();
 	void CountPoints();
+	void CheckAvailability(int movement);
 
 	void DrawCircle(GLdouble x, GLdouble y, GLdouble z, GLdouble raio, int num_linhas);
 	void DrawCube(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
