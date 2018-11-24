@@ -21,7 +21,8 @@ public:
 	virtual void KeyDownPressed(WPARAM	wParam);	// Tratamento de teclas pressionadas
 	virtual int DrawGLScene(void);					// Função que desenha a cena
 
-	void Draw3DSGrid(float width, float length);
+	//void Draw3DSGrid(float width, float length);
+	void Draw3DSGrid();
 	void DrawAxis();
 	void DrawPecas();
 	void FlipPecas();

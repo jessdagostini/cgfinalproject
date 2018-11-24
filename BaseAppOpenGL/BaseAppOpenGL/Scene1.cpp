@@ -40,9 +40,9 @@ CScene1::CScene1()
 	pTextures = new CTexture();
 	pTextures->CreateTextureMipMap(0, "../Scene1/crate.bmp");
 	pTextures->CreateTextureMipMap(1, "../Scene1/grass.bmp");
-	pTextures->CreateTextureLinear(2, "../Scene1/pl_earth_full.jpg");
-	pTextures->CreateTextureTGA(3, "../Scene1/tree.tga");
-	pTextures->CreateTextureTGA(4, "../Scene1/tree2.tga");
+	pTextures->CreateTextureLinear(2, "../Scene1/por.jpg");
+	//pTextures->CreateTextureTGA(3, "../Scene1/por.tga");
+	//pTextures->CreateTextureTGA(4, "../Scene1/tree2.tga");
 	
 
 	fPosX = 0.0f;
@@ -59,12 +59,12 @@ CScene1::CScene1()
 	pModel3DS_1->Load("../Scene1/ok.3DS");
 
 	// Carrega Objetos da  Cena (muro)
-	pModel3DS_2 = new CModel_3DS();
-	pModel3DS_2->Load("../Scene1/Muro.3DS");
+	//pModel3DS_2 = new CModel_3DS();
+	//pModel3DS_2->Load("../Scene1/Muro.3DS");
 
 	// Carrega Objetos da  Cena (gramado)
-	pModel3DS_3 = new CModel_3DS();
-	pModel3DS_3->Load("../Scene1/Plane001.3DS");
+	//pModel3DS_3 = new CModel_3DS();
+	//pModel3DS_3->Load("../Scene1/Plane001.3DS");
 
 	// Inicializa o vetor que contém o controle das peças
 	for (int i = 0; i < 8; i++) {
@@ -203,14 +203,18 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	pModel3DS_1->Draw();
 	glPopMatrix();
 	
+
 	// Desenha as árvores aplicando Blending.
 	// A operação é baseada no canal Alpha da textura .TGA
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(1.0f, 0.0f, 0.0f, 0.6f);
+	glEnable(GL_ALPHA_TEST);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
 	glPushMatrix();
-	auxSolidBox(100.0f, 0.1f, 100.0f);
+	Draw3DSGrid();
+	//auxSolidBox(215.0f, 0.1f, 215.0f);
 	glPopMatrix();
+	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 
@@ -463,6 +467,10 @@ void CScene1::CountPoints()
 		else {
 			winner = 1;
 		}
+	}else if (pWhitePoints == 0) {
+		winner = 0;
+	}else if (pBlackPoints == 0) {
+		winner = 1;
 	}
 	else {
 		winner = -1;
@@ -598,10 +606,26 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 }
 
 //	Cria um grid horizontal ao longo dos eixos X e Z
-void CScene1::Draw3DSGrid(float width, float length)
-{
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+void CScene1::Draw3DSGrid()
+{//float width, float length
+	pTextures->ApplyTexture(2);
+	glPushMatrix();
+	for (float i = -100; i <= 100; i += 20)
+	{
+		for (float j = -100; j <= 100; j += 20)
+		{
+			// Start drawing some lines
+			glBegin(GL_QUADS);
+			glNormal3f(0.0f, 50.0f, 0.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(i, 0.0f, j + 20);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(i + 20, 0.0f, j + 20);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(i + 20, 0.0f, j);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(i, 0.0f, j);
+			glEnd();
+		}
+	}
+	glPopMatrix();
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glColor3f(0.0f, 0.3f, 0.0f);
 	glPushMatrix();
 	for (float i = -width; i <= length; i += 1)
@@ -618,7 +642,7 @@ void CScene1::Draw3DSGrid(float width, float length)
 			glEnd();
 		}
 	}
-	glPopMatrix();
+	glPopMatrix();*/
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 

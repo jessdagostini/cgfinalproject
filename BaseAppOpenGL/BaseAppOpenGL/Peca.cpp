@@ -24,6 +24,17 @@ void Peca::showPeca(float pY, float pC)
 	glColor3f(color, color, color);
 	glRotatef(-90.0f, 1.0f, .0f, 0.0f);
 	DrawCircle(0.0f, 0.0f, 1.0f, 1.0f, 25);
+	glPushMatrix();
+	glTranslatef(-0.4f, 0.4f, 0.0f);
+	if (color == 0.0f) {
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else {
+		glColor3f(0.0f, 0.0f, 0.0f);
+	}
+	
+	glutSolidTorus(.7f, 0.75f, 25, 25);
+	glPopMatrix();
 	glPopMatrix();
 }
 
